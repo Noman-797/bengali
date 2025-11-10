@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bengali Converto</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23374151'/%3E%3Cstop offset='100%25' style='stop-color:%23111827'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='10' y='10' width='80' height='80' rx='15' fill='url(%23grad)'/%3E%3Ctext x='50' y='65' font-family='Anek Bangla, sans-serif' font-size='40' fill='white' text-anchor='middle'%3E%E0%A6%AC%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@100..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.24/dist/full.min.css" rel="stylesheet" type="text/css" />
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#4f46e5",
+            "background-light": "#f8fafc",
+            "background-dark": "#0f172a",
+          },
+          fontFamily: {
+            display: ["Ubuntu", "sans-serif"],
+            heading: ["Playfair Display", "serif"],
+            bengali: ["Anek Bangla", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "0.5rem",
+          },
+        },
+      },
+    };
+</script>
+<style>
+    .material-icons-outlined {
+      font-feature-settings: 'liga';
+    }
+</style>
+</head>
+{% load static %}
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-700 dark:text-slate-300 antialiased">
+{% csrf_token %}
+<div class="flex flex-col h-screen">
+<header class="flex items-center justify-between p-3 sm:p-4 border-b border-slate-200 dark:border-slate-800 shadow-md bg-white dark:bg-slate-900">
+<div class="flex items-center gap-2 sm:gap-3">
+<div class="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-900 dark:from-slate-600 dark:to-slate-800 rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+<span class="text-white font-bold text-lg font-bengali">ব</span>
+</div>
+<h1 class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 font-heading" style="font-weight: 800;">Bengali Converto</h1>
+</div>
+<div class="flex items-center gap-2 sm:gap-4">
+<div class="flex items-center gap-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+<span class="material-icons-outlined text-sm">visibility</span>
+<span id="viewerCount" class="font-display">{{ viewer_count|default:"0" }}</span>
+</div>
+
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark text-slate-500 dark:text-slate-400" id="theme-toggle" type="button">
+<span class="material-icons-outlined block dark:hidden">dark_mode</span>
+<span class="material-icons-outlined hidden dark:block">light_mode</span>
+</button>
+</div>
+</header>
+
+<main class="flex-1 p-2 sm:p-4 lg:p-6">
+<div class="max-w-6xl mx-auto h-full">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4 lg:gap-6 h-full">
+<!-- Left Box - Input -->
+<div class="flex flex-col h-64 sm:h-80 lg:h-full">
+<div class="flex items-center justify-between mb-2 sm:mb-3">
+<h2 class="text-sm sm:text-base lg:text-lg font-semibold text-slate-800 dark:text-white font-display">English / Banglish</h2>
+<button onclick="clearInput()" class="btn btn-error btn-xs font-display">Clear</button>
+</div>
+<div class="flex-1 relative">
+<textarea 
+    id="inputText"
+    class="w-full h-full bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-lg p-3 sm:p-4 text-sm sm:text-base text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 resize-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-lg"
+    placeholder="ইংরেজি বা বাংলিশে লেখো... আমি বাংলায় বলবো" style="font-family: 'Anek Bangla', sans-serif;"
+></textarea>
+</div>
+
+</div>
+
+<!-- Right Box - Output -->
+<div class="flex flex-col h-64 sm:h-80 lg:h-full">
+<div class="flex items-center justify-between mb-2 sm:mb-3">
+<h2 class="text-sm sm:text-base lg:text-lg font-semibold text-slate-800 dark:text-white font-display">Bengali Translation</h2>
+<button onclick="copyTranslation()" class="btn btn-info btn-xs font-display">
+<span class="material-icons-outlined text-xs">content_copy</span>
+<span class="hidden sm:inline">Copy</span>
+</button>
+</div>
+<div class="flex-1 relative">
+<div 
+    id="outputText"
+    class="w-full h-full bg-white dark:bg-slate-800/30 border border-slate-300 dark:border-slate-700 rounded-lg p-3 sm:p-4 text-sm sm:text-base lg:text-lg text-slate-800 dark:text-slate-200 overflow-y-auto shadow-lg"
+>
+<div class="text-slate-500 dark:text-slate-400 font-bengali text-sm sm:text-base">এখানে বাংলা অনুবাদ দেখাবে...</div>
+</div>
+</div>
+
+
+</div>
+</div>
+</div>
+</main>
+
+<!-- Footer -->
+<footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 sm:p-4">
+<div class="max-w-6xl mx-auto flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+<span class="font-display">Developed by</span>
+<a href="https://nomancse.netlify.app" target="_blank" class="text-primary hover:text-indigo-700 font-medium flex items-center gap-1 font-display">
+<span class="material-icons-outlined text-sm">language</span>
+Abdullah Al Noman
+</a>
+</div>
+</footer>
+
+</div>
+
+
+
+<script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const inputText = document.getElementById('inputText');
+    const outputText = document.getElementById('outputText');
+    let translateTimeout;
+
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+
+    // Auto translate on input
+    inputText.addEventListener('input', () => {
+        clearTimeout(translateTimeout);
+        const text = inputText.value.trim();
+        
+        if (!text) {
+            outputText.innerHTML = '<div class="text-slate-500 dark:text-slate-400 font-bengali text-sm sm:text-base">এখানে বাংলা অনুবাদ দেখাবে...</div>';
+            return;
+        }
+        
+        translateTimeout = setTimeout(() => {
+            translateText();
+        }, 1000); // Wait 1 second after user stops typing
+    });
+
+
+
+    // Manual translate only - no auto translate
+    let isTranslating = false;
+    
+    async function translateText() {
+        const text = inputText.value.trim();
+        if (!text || isTranslating) {
+            return;
+        }
+        
+        isTranslating = true;
+        outputText.innerHTML = '<div class="text-slate-500 dark:text-slate-400 italic flex items-center gap-2"><span class="material-icons-outlined animate-spin text-sm">refresh</span>Translating...</div>';
+        
+
+
+        try {
+            const response = await fetch('/chat/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ 
+                    message: text
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                outputText.innerHTML = `<div class="text-slate-800 dark:text-slate-200 text-lg leading-relaxed font-bengali">${data.response}</div>`;
+            } else {
+                outputText.innerHTML = `<div class="text-red-500">${data.error}</div>`;
+            }
+        } catch (error) {
+            outputText.innerHTML = '<div class="text-red-500">Translation error</div>';
+        } finally {
+            isTranslating = false;
+        }
+    }
+
+    function clearInput() {
+        inputText.value = '';
+        outputText.innerHTML = '<div class="text-slate-500 dark:text-slate-400 font-bengali text-sm sm:text-base">এখানে বাংলা অনুবাদ দেখাবে...</div>';
+    }
+
+    function copyTranslation() {
+        const translation = outputText.textContent;
+        if (translation && !translation.includes('এখানে বাংলা অনুবাদ')) {
+            navigator.clipboard.writeText(translation);
+            
+            // Show checkmark feedback
+            const copyBtn = event.target.closest('button');
+            const originalHTML = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<span class="material-icons-outlined text-xs">check</span><span class="hidden sm:inline">Copied</span>';
+            copyBtn.classList.remove('btn-info');
+            copyBtn.classList.add('btn-success');
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = originalHTML;
+                copyBtn.classList.remove('btn-success');
+                copyBtn.classList.add('btn-info');
+            }, 2000);
+        }
+    }
+
+
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
